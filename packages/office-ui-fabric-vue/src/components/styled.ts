@@ -53,14 +53,21 @@ export function styled<
         _styles.__cachedInputs__ = [baseStyles, context.props.styles]
       }
 
+      const props = {
+        // @ts-ignore
+        ...(Component.defaultProps ? Component.defaultProps : {}),
+        ...rest,
+        ...additionalProps,
+        ...context.props,
+        ...context.data.props,
+        className: context.props.className || context.data.class,
+        styles: _styles,
+      }
       return h(Component, {
         ...context.data,
         props: {
-          ...rest,
-          ...additionalProps,
-          ...context.props,
-          className: context.props.className || context.data.class,
-          styles: _styles,
+          ...props,
+          props,
         },
       }, context.children)
     },

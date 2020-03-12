@@ -1,19 +1,19 @@
 <template>
   <div :class="classNames.root">
-    <Label :class="classNames.titleLabel" v-text="label" />
+    <Label :class="classNames.titleLabel" v-text="props.label" />
     <div :class="classNames.container">
       <div :class="classNames.slideBox"
-           :tabindex="disabled ? void 0 : 0"
+           :tabindex="props.disabled ? void 0 : 0"
            @mousedown="onMouseDown"
            @keydown="onKeyDown">
         <div ref="sliderLine" :class="classNames.line">
-          <span v-if="originFromZero"
+          <span v-if="props.originFromZero"
                 :class="classNames.zeroTick"
-                :style="{ [vertical ? 'bottom' : 'left']: `${zeroOffsetPercent}%` }" />
+                :style="{ [props.vertical ? 'bottom' : 'left']: `${zeroOffsetPercent}%` }" />
           <span :class="classNames.thumb"
-                :style="{ [vertical ? 'bottom' : 'left']: `${thumbOffsetPercent}%` }" />
+                :style="{ [props.vertical ? 'bottom' : 'left']: `${thumbOffsetPercent}%` }" />
 
-          <template v-if="originFromZero">
+          <template v-if="props.originFromZero">
             <span :class="css(classNames.lineContainer, classNames.inactiveSection)"
                   :style="{ [lengthString]: `${Math.min(thumbOffsetPercent, zeroOffsetPercent)}%` }" />
             <span :class="css(classNames.lineContainer, classNames.activeSection)"
@@ -30,8 +30,8 @@
         </div>
       </div>
       <Label :class="classNames.valueLabel">
-        <slot name="value" :value="internalValue">
-          {{ internalValue }}
+        <slot name="value" :value="value">
+          {{ value }}
         </slot>
       </Label>
     </div>
@@ -49,58 +49,91 @@ const getClassNames = classNamesFunction()
 
 export const ONKEYDOWN_TIMEOUT_DURATION = 1000
 
+interface IProps {
+  value: number
+  defaultValue: number
+  min: number
+  [key: string]: any
+}
+
+export interface ISliderState {
+  value?: number;
+  renderedValue?: number;
+}
+
 @Component({
   components: { Label },
 })
-export default class Slider extends BaseComponent {
+export default class Slider extends BaseComponent<IProps, ISliderState> {
+  public static defaultProps: ISliderProps = {
+    step: 1,
+    min: 0,
+    max: 10,
+    showValue: true,
+    disabled: false,
+    vertical: false,
+    buttonProps: {},
+    originFromZero: false,
+  };
+
   $refs!: {
     sliderLine: HTMLDivElement
   }
-  @Prop({ type: String, default: null }) label!: string
-  @Prop({ type: Boolean, default: false }) disabled!: boolean
-  @Prop({ type: Boolean, default: false }) vertical!: boolean
-  @Prop({ type: Boolean, default: false }) snapToStep!: boolean
-  @Prop({ type: Number, default: 0 }) min!: number
-  @Prop({ type: Number, default: 10 }) max!: number
-  @Prop({ type: Number, default: 1 }) step!: number
-  @Prop({ type: Number, default: null }) value!: number
-  @Prop({ type: Number, default: null }) defaultValue!: number
-  @Prop({ type: Boolean, default: false }) showValue!: boolean
-  @Prop({ type: Boolean, default: false }) originFromZero!: boolean
-
-  private internalValue?: number = this.value || this.defaultValue || this.min
-  private renderedValue?: number = this.value || this.defaultValue || this.min
 
   private onKeyDownTimer = -1;
 
+  constructor () {
+    super()
+    this.state = {
+      value: this.props.value || this.props.defaultValue || this.props.min,
+      renderedValue: undefined,
+    }
+  }
+
   get classNames () {
-    const { className, disabled, vertical, renderedValue, internalValue, showValue, theme } = this
-    return getClassNames(this.styles, {
+    const { className, disabled, vertical, renderedValue, value, showValue, theme, styles } = this.props
+    return getClassNames(styles, {
       className,
       disabled,
       vertical,
-      showTransitions: renderedValue === internalValue,
+      showTransitions: renderedValue === value,
       showValue,
       theme: theme!,
     })
   }
 
   get thumbOffsetPercent () {
-    const { min, max, renderedValue } = this
+    const { min, max } = this.props
+    const { renderedValue } = this
     return min === max ? 0 : ((renderedValue! - min!) / (max! - min!)) * 100
   }
 
   get zeroOffsetPercent () {
-    const { min, max } = this
+    const { min, max } = this.props
     return min! >= 0 ? 0 : (-min! / (max! - min!)) * 100
   }
 
   get lengthString () {
-    return this.vertical ? 'height' : 'width'
+    return this.props.vertical ? 'height' : 'width'
+  }
+
+  public get value (): number | undefined {
+    const { value = this.state.value } = this.props
+    if (this.props.min === undefined || this.props.max === undefined || value === undefined) {
+      return undefined
+    } else {
+      return Math.max(this.props.min, Math.min(this.props.max, value))
+    }
+  }
+
+  private get renderedValue (): number | undefined {
+    // renderedValue is expected to be defined while user is interacting with control, otherwise `undefined`. Fall back to `value`.
+    const { renderedValue = this.value } = this.state
+    return renderedValue
   }
 
   private onMouseDown (event: any) {
-    if (this.disabled) return
+    if (this.props.disabled) return
     if (event.type === 'mousedown') {
       window.addEventListener('mousemove', this.onMove, true)
       window.addEventListener('mouseup', this.onMouseUp, true)
@@ -112,8 +145,10 @@ export default class Slider extends BaseComponent {
   }
 
   private onMouseUp (event: any) {
-    if (this.disabled) return
-    this.renderedValue = this.internalValue
+    if (this.props.disabled) return
+    this.setState({
+      renderedValue: this.state.value,
+    })
     window.removeEventListener('mousemove', this.onMove, true)
     window.removeEventListener('mouseup', this.onMouseUp, true)
     window.removeEventListener('touchmove', this.onMove, true)
@@ -122,7 +157,7 @@ export default class Slider extends BaseComponent {
 
   private onMove (event: any) {
     window.requestAnimationFrame(() => {
-      const { max, min, step, vertical } = this
+      const { max, min, step, vertical } = this.props
       const steps: number = (max! - min!) / step!
       const sliderPositionRect: ClientRect = this.$refs.sliderLine.getBoundingClientRect()
       const sliderLength: number = !vertical
@@ -142,20 +177,20 @@ export default class Slider extends BaseComponent {
         currentSteps = distance / stepLength
       }
 
-      let internalValue: number
+      let value: number
       let renderedValue: number
 
       // The value shouldn't be bigger than max or be smaller than min.
       if (currentSteps! > Math.floor(steps)) {
-        renderedValue = internalValue = max as number
+        renderedValue = value = max as number
       } else if (currentSteps! < 0) {
-        renderedValue = internalValue = min as number
+        renderedValue = value = min as number
       } else {
         renderedValue = min! + step! * currentSteps!
-        internalValue = min! + step! * Math.round(currentSteps!)
+        value = min! + step! * Math.round(currentSteps!)
       }
 
-      this.updateValue(internalValue, renderedValue)
+      this.updateValue(value, renderedValue)
     })
   }
 
@@ -179,7 +214,7 @@ export default class Slider extends BaseComponent {
   }
 
   private updateValue (value: number, renderedValue: number): void {
-    const { step, snapToStep } = this
+    const { step, snapToStep } = this.props
     let numDec = 0
     if (isFinite(step!)) {
       while (Math.round(step! * Math.pow(10, numDec)) / Math.pow(10, numDec) !== step!) {
@@ -188,20 +223,22 @@ export default class Slider extends BaseComponent {
     }
     // Make sure value has correct number of decimal places based on number of decimals in step
     const roundedValue = parseFloat(value.toFixed(numDec))
-    const valueChanged = roundedValue !== this.internalValue
+    const valueChanged = roundedValue !== this.value
 
     if (snapToStep) {
       renderedValue = roundedValue
     }
 
-    this.internalValue = roundedValue
-    this.renderedValue = renderedValue
-    this.$emit('input', roundedValue)
+    this.setState({
+      value: roundedValue,
+      renderedValue,
+    })
+    this.$emit('input', this.state.value)
   }
 
   private onKeyDown (event: KeyboardEvent): void {
-    let value: number | undefined = this.internalValue
-    const { max, min, step } = this
+    let value: number | undefined = this.value
+    const { max, min, step } = this.props
 
     let diff: number | undefined = 0
 

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="sidebar">
-      <f-nav :groups="groups" />
+      <!-- <f-nav :groups="groups" /> -->
     </div>
     <div class="content">
       <div class="">

@@ -3,17 +3,24 @@ import { ITextStyles } from './Text.types'
 import { classNamesFunction } from '@uifabric-vue/utilities'
 import { CreateElement, RenderContext } from 'vue'
 import StatelessComponent from '../StatelessComponent'
+import { ITheme } from '@uifabric/styling'
+import { IStyleFunctionOrObject } from '@uifabric/merge-styles'
 
 const getClassNames = classNamesFunction<any, ITextStyles>()
 
+interface Props {
+  theme: ITheme
+  styles: IStyleFunctionOrObject<any, any>
+  block: boolean
+  nowrap: boolean
+  variant: string
+}
+
 @Component
 export default class Text extends StatelessComponent {
-  @Prop({ type: Boolean, default: false }) nowrap!: boolean
-  @Prop({ type: Boolean, default: false }) block!: boolean
-  @Prop({ type: String, default: 'medium' }) variant!: string
-
   render (h: CreateElement, context: RenderContext) {
-    const { theme, styles, block, nowrap, variant } = context.props
+    console.log(context)
+    const { theme, styles, block, nowrap, variant } = context.data.props as Props
     const classNames = getClassNames(styles, {
       theme,
       block,

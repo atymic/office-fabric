@@ -15,20 +15,20 @@
       <f-slider label="Basic Example"
                 :min="0"
                 :max="10"
-                :value="3" />
+                :default-value="3" />
       <f-slider label="Snapping Slider Example"
                 :min="0"
                 :max="50"
                 :step="10"
-                :value="10"
-                snap-to-step />
+                :default-value="10"
+                :snap-to-step="true" />
       <f-slider label="Disabled example"
                 :min="50"
                 :max="500"
                 :step="50"
                 :default-value="300"
-                show-value
-                disabled />
+                :show-value="true"
+                :disabled="true" />
       <f-slider v-model="value1"
                 :label="`Controlled example - ${value1}`"
                 :min="0"
@@ -37,7 +37,7 @@
                 :min="0"
                 :max="100"
                 :default-value="55"
-                show-value>
+                :show-value="true">
         <template #value="{ value }">
           {{ value }}%
         </template>
@@ -46,7 +46,7 @@
                 :min="-5"
                 :max="15"
                 :default-value="3"
-                origin-from-zero />
+                :origin-from-zero="true" />
 
       <h2>Vertical Sliders</h2>
       <div style="display: flex; height: 250px">
@@ -54,19 +54,19 @@
                   :min="0"
                   :max="10"
                   :value="3"
-                  vertical />
+                  :vertical="true" />
         <f-slider label="Disabled"
                   :min="0"
                   :max="10"
                   :value="3"
-                  vertical
-                  disabled />
+                  :vertical="true"
+                  :disabled="true" />
         <f-slider label="Origin from zero"
                   :min="-5"
                   :max="15"
                   :default-value="3"
-                  vertical
-                  origin-from-zero />
+                  :vertical="true"
+                  :origin-from-zero="true" />
       </div>
     </div>
 

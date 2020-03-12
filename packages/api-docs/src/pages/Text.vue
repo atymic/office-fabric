@@ -14,7 +14,7 @@
 
       <h2>Text</h2>
       <div>
-        <f-text variant="large" block>
+        <f-text variant="large" :block="true">
           Wrap (Default)
         </f-text>
         <f-text>
@@ -22,10 +22,10 @@
         </f-text>
       </div>
       <div>
-        <f-text variant="large" block>
+        <f-text variant="large" :block="true">
           No Wrap
         </f-text>
-        <f-text nowrap>
+        <f-text :nowrap="true" :block="true">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </f-text>
       </div>
