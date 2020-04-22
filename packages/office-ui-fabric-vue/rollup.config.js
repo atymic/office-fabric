@@ -14,11 +14,7 @@ import pkg from './package.json'
 
 const packageRoot = path.resolve(__dirname)
 
-console.log([
-  ...Object.keys(pkg.dependencies),
-  '@microsoft/load-themed-styles',
-  '@uifabric/set-version'
-]);
+const extensions = ['.js', '.jsx', '.json', '.ts', '.tsx', '.vue']
 
 export default {
   // external: [
@@ -28,14 +24,13 @@ export default {
   input: './src/index.ts',
   output: {
     dir: path.resolve('lib'),
-    // file: 'dist/office-ui-fabric-vue.esm.js',
     format: 'esm',
     sourcemap: false,
   },
   external: [
     ...Object.keys(pkg.dependencies),
     '@microsoft/load-themed-styles',
-    '@uifabric/set-version'
+    '@uifabric/set-version',
   ],
   preserveModules: true,
   preserveSymlinks: true,
@@ -45,7 +40,7 @@ export default {
       'process.env.NODE_ENV': JSON.stringify('production'),
     }),
     alias({
-      resolve: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+      resolve: extensions,
       entries: [
         { find: /^@\/(.*)/, replacement: path.resolve(packageRoot, 'src/$1') },
         { find: '@uifabric/utilities', replacement: '@uifabric-vue/utilities' },
@@ -66,13 +61,13 @@ export default {
       },
     }),
     resolve({
-      extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
+      extensions: extensions,
       preferBuiltins: true,
     }),
     commonjs({ include: /node_modules/ }),
     babel({
       exclude: /node_modules/,
-      extensions: ['.js', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
+      extensions: extensions,
       babelrc: false,
       configFile: false,
       presets: [

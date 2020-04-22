@@ -29,10 +29,10 @@ export const SomeComponent: VueConstructor = createComponent(SomeComponentBase, 
 ``` -->
 # Office UI Fabric Vue
 
-## Differences to React
+## Differences to Office UI Fabric React
 ### Class Binding
 React uses `className` to bind CSS-classes to elements. In Vue you can use `class` instead. `className` is still
-supported via the `styled` HoC in Office UI Fabric Vue.
+supported however via the `styled` HoC in Office UI Fabric Vue.
 
 ### Content Distribution
 Instead of using `onRender<Something>`, the Vue components use `slots` to customize rendering. I.e., a react component
@@ -42,3 +42,5 @@ with `onRenderComment (comment: string) ...` is `<template #comment="{ comment }
 
 ### Caveats
 * Use `JSX/TSX` instead of `SFC`s when writing a recursive template to avoid circular imports.
+* Library build is very slow because of `rollup-plugin-typescript2`. `tsc` cannot be used directly because TSX support
+  is very bad in Vue 2.0.
