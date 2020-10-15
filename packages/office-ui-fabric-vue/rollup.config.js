@@ -5,6 +5,7 @@ import json from '@rollup/plugin-json'
 import path from 'path'
 
 import vue from 'rollup-plugin-vue'
+import typescript from 'rollup-plugin-typescript2'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 // @ts-ignore
@@ -14,7 +15,7 @@ import pkg from './package.json'
 const packageRoot = path.resolve(__dirname)
 
 export default {
-  input: './tmp/index.js',
+  input: './src/index.ts',
   output: {
     dir: 'lib',
     format: 'esm',
@@ -46,23 +47,41 @@ export default {
         isProduction: true,
       },
     }),
+    typescript({
+      check: false,
+      typescript: require('typescript'),
+      useTsconfigDeclarationDir: true,
+      rollupCommonJSResolveHack: true,
+    }),
     resolve({
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       preferBuiltins: true,
     }),
     commonjs({
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       include: /node_modules/,
       sourceMap: false,
     }),
     babel({
-      exclude: /node_modules\/(?!vue-runtime-helpers)/gi,
-      extensions: ['.js', '.jsx'],
+      exclude: /node_modules/gi,
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       babelrc: false,
       configFile: false,
       babelHelpers: 'runtime',
       presets: [
         '@vue/babel-preset-jsx',
-        '@babel/preset-env',
+        [
+          '@babel/preset-env',
+          {
+            targets: {
+              browsers: [
+                '> 1%',
+                'last 2 versions',
+                'IE 11',
+              ],
+            },
+          },
+        ],
       ],
       plugins: [
         '@babel/plugin-transform-runtime',
