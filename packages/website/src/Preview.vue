@@ -1,24 +1,24 @@
 <template>
-  <ThemeProvider :theme="theme">
-    <div class="wrapper"
-         :style="{ color: theme.semanticColors.bodyText, backgroundColor: theme.semanticColors.bodyBackground }">
-      <div class="topNav" :style="{ backgroundColor: theme.palette.neutralLighter, boxShadow: theme.effects.elevation8 }">
-        <DefaultButton @click.native="toggleTheme('light')">Light Theme</DefaultButton>
-        <DefaultButton @click.native="toggleTheme('dark')">Dark Theme</DefaultButton>
-      </div>
+  <div class="wrapper"
+       :style="{ color: theme.semanticColors.bodyText, backgroundColor: theme.semanticColors.bodyBackground }">
+    <div class="topNav" :style="{ backgroundColor: theme.palette.neutralLighter, boxShadow: theme.effects.elevation8 }">
+      <DefaultButton @click.native="toggleTheme('light')">Light Theme</DefaultButton>
+      <DefaultButton @click.native="toggleTheme('dark')">Dark Theme</DefaultButton>
+    </div>
 
-      <div class="page">
-        <div class="sidebar">
+    <div class="page">
+      <div class="sidebar">
+        <ThemeProvider :theme="theme">
           <Nav :groups="groups" />
-        </div>
-        <div class="content" :style="{ backgroundColor: theme.palette.neutralLighter }">
-          <div :style="{ backgroundColor: theme.semanticColors.bodyBackground }">
-            <router-view v-bind="null" />
-          </div>
+        </ThemeProvider>
+      </div>
+      <div class="content" :style="{ backgroundColor: theme.palette.neutralLighter }">
+        <div :style="{ backgroundColor: theme.semanticColors.bodyBackground }">
+          <router-view v-bind="null" />
         </div>
       </div>
     </div>
-  </ThemeProvider>
+  </div>
 </template>
 
 <script lang="ts">

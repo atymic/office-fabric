@@ -4,7 +4,9 @@ import { css, Async, IDisposable, EventGroup } from '@uifabric-vue/utilities'
 import { getTheme, IPartialTheme, ITheme } from '@uifabric/styling'
 
 // @ts-ignore
-@Component
+@Component({
+  inject: ['$theme'],
+})
 export default abstract class BaseComponent<TProps = {}, TState = {}> extends Vue {
   $props!: TProps
 
@@ -23,13 +25,8 @@ export default abstract class BaseComponent<TProps = {}, TState = {}> extends Vu
   protected props: TProps = {} as TProps
 
   get theme (): ITheme {
-    let parent = this as any
-    // eslint-disable-next-line no-cond-assign
-    while (parent = parent.$parent) {
-      if (parent.theme) return parent.theme
-    }
-
-    return getTheme()
+    // @ts-ignore
+    return this.$theme ? this.$theme() : getTheme()
   }
 
   // created () {
