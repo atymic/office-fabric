@@ -1,19 +1,21 @@
 import { IPartialTheme, ITheme, createTheme, loadTheme as baseLoadTheme } from '@uifabric/styling'
 import { registerCSSVars } from './registerCSSVars'
 
-export function loadTheme (theme: IPartialTheme): ITheme {
-  const _theme = createTheme(theme)
+export { baseLoadTheme as loadTheme }
 
-  let { palette, semanticColors } = _theme
-  // generate new css vars
-  palette = registerCSSVars('palette', palette)
-  semanticColors = registerCSSVars('semanticColors', semanticColors)
+// export function loadTheme (theme: IPartialTheme): ITheme {
+//   const _theme = createTheme(theme)
 
-  // update theme
-  baseLoadTheme({
-    palette,
-    semanticColors,
-  })
+//   let { palette, semanticColors } = _theme
+//   // generate new css vars
+//   palette = registerCSSVars('palette', palette)
+//   semanticColors = registerCSSVars('semanticColors', semanticColors)
 
-  return _theme
-}
+//   // update theme
+//   baseLoadTheme({
+//     palette,
+//     semanticColors,
+//   })
+
+//   return _theme
+// }

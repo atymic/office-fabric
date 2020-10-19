@@ -1,34 +1,37 @@
 <template>
-  <div class="wrapper">
-    <div class="topNav" :style="{ boxShadow: theme.effects.elevation8 }">
-      <DefaultButton @click.native="toggleTheme('light')">Light Theme</DefaultButton>
-      <DefaultButton @click.native="toggleTheme('dark')">Dark Theme</DefaultButton>
-    </div>
-
-    <div class="page">
-      <div class="sidebar">
-        <Nav :groups="groups" />
+  <ThemeProvider :theme="theme">
+    <div class="wrapper"
+         :style="{ color: theme.semanticColors.bodyText, backgroundColor: theme.semanticColors.bodyBackground }">
+      <div class="topNav" :style="{ backgroundColor: theme.palette.neutralLighter, boxShadow: theme.effects.elevation8 }">
+        <DefaultButton @click.native="toggleTheme('light')">Light Theme</DefaultButton>
+        <DefaultButton @click.native="toggleTheme('dark')">Dark Theme</DefaultButton>
       </div>
-      <div class="content">
-        <div class="">
-          <router-view v-bind="null" />
+
+      <div class="page">
+        <div class="sidebar">
+          <Nav :groups="groups" />
+        </div>
+        <div class="content" :style="{ backgroundColor: theme.palette.neutralLighter }">
+          <div :style="{ backgroundColor: theme.semanticColors.bodyBackground }">
+            <router-view v-bind="null" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </ThemeProvider>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { DefaultButton, IPartialTheme, loadTheme, Nav } from '@uifabric-vue/office-ui-fabric-vue'
-import { DefaultEffects, getTheme } from '@uifabric/styling'
+import { ThemeProvider, DefaultButton, IPartialTheme, Nav } from '@uifabric-vue/office-ui-fabric-vue'
+import { createTheme, DefaultEffects, getTheme, loadTheme } from '@uifabric/styling'
 
 const publicPath = process.env.NODE_ENV === 'production'
   ? '/office-fabric'
   : ''
 
 @Component({
-  components: { DefaultButton, Nav },
+  components: { ThemeProvider, DefaultButton, Nav },
 })
 export default class Preview extends Vue {
   theme = getTheme()
@@ -189,7 +192,7 @@ export default class Preview extends Vue {
         white: '#323130',
       }
     }
-    loadTheme(_theme)
+    this.theme = loadTheme(_theme)
   }
 }
 </script>
@@ -204,27 +207,22 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  color: var(--fabric-bodyText);
 }
 .topNav {
   display: flex;
   padding: 10px;
-  background: var(--fabric-neutralLighter);
   align-items: center;
   justify-content: flex-end;
   z-index: 1;
 }
 .page {
-  background: var(--fabric-neutralLighter);
   display: flex;
   position: relative;
   flex: 1;
   overflow: auto;
 }
 .sidebar {
-  background: var(--fabric-bodyBackground);
   width: 300px;
-  margin-right: 10px;
   overflow-y: scroll;
 
   & > nav {
@@ -238,7 +236,6 @@ body {
   overflow: auto;
 }
 .content--inner {
-  background: var(--fabric-bodyBackground);
   padding: 28px;
   margin: 20px 0;
 }

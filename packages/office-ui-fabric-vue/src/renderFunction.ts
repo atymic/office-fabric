@@ -4,7 +4,7 @@ type Tag = string | Component<any, any, any, any> | AsyncComponent<any, any, any
 
 export interface CreateElement {
   <T>(tag?: Tag, children?: VNodeChildren): VNode;
-  <T>(tag?: Tag, data?: VNodeData & { attrs?: Partial<T> }, children?: VNodeChildren): VNode;
+  <T>(tag?: Tag, data?: VNodeData & { attrs?: T }, children?: VNodeChildren): VNode;
 }
 
 let h: CreateElement

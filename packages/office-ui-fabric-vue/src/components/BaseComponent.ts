@@ -1,17 +1,16 @@
-import { Prop, Component } from 'vue-property-decorator'
+import { Vue, Prop, Component, InjectReactive, Inject, Provide } from 'vue-property-decorator'
 import { IProcessedStyleSet } from '@uifabric/merge-styles'
 import { css, Async, IDisposable, EventGroup } from '@uifabric-vue/utilities'
-import { getTheme } from '@uifabric/styling'
-import { Component as TsxComponent } from 'vue-tsx-support'
+import { getTheme, IPartialTheme, ITheme } from '@uifabric/styling'
 
 // @ts-ignore
 @Component
-export default abstract class BaseComponent<TProps = {}, TState = {}> extends TsxComponent<TProps, any, any> {
+export default abstract class BaseComponent<TProps = {}, TState = {}> extends Vue {
   $props!: TProps
 
   @Prop({ type: [String, Array], default: '' }) readonly className!: string
   @Prop({ type: [Object, Function], default: () => {} }) readonly styles!: any
-  @Prop({ type: Object, default: () => getTheme() }) readonly theme!: any
+  // @Prop({ type: Object, default: () => getTheme() }) readonly theme!: ITheme
 
   componentRef: HTMLElement | null = null
   css = css
@@ -22,6 +21,16 @@ export default abstract class BaseComponent<TProps = {}, TState = {}> extends Ts
 
   protected state: TState = {} as TState
   protected props: TProps = {} as TProps
+
+  get theme (): ITheme {
+    let parent = this as any
+    // eslint-disable-next-line no-cond-assign
+    while (parent = parent.$parent) {
+      if (parent.theme) return parent.theme
+    }
+
+    return getTheme()
+  }
 
   // created () {
   //   for (const key in this.$props) {

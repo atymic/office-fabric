@@ -11,6 +11,7 @@ export * from './components'
 
 export * from './Styling'
 export * from './Utilities'
+export * from './ThemeProvider'
 
 export * from './utilities/selectableOption'
 export * from './utilities/positioning'
