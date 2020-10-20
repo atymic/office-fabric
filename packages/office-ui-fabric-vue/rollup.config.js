@@ -62,7 +62,10 @@ export default {
       babelHelpers: 'runtime',
       presets: [
         '@vue/babel-preset-jsx',
-        '@babel/preset-env',
+        ['@babel/preset-env', {
+          loose: true,
+          bugfixes: true,
+        }],
       ],
       plugins: [
         '@babel/plugin-transform-runtime',
